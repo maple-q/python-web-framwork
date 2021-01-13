@@ -42,11 +42,15 @@ class Router(object):
         """
         self.route_map = OrderedDict()
 
-    def add_url_rule(self, url, view_function, method):
+    def add_url_rule(self, url, view_function, method, class_name):
         if url in self.route_map:
             raise Exception('Existing url: {}'.format(url))
 
-        self.route_map[url] = view_function
+        self.route_map[url] = {
+            'method': method,
+            'view': view_function,
+            'instance': class_name()
+        }
 
     def __str__(self):
         router_size = len(self.route_map)
@@ -72,7 +76,7 @@ class MetaController(type):
 
         for name, value in attrs.items():
             if hasattr(value, 'url') and hasattr(value, 'method'):
-                r.add_url_rule(prefix + getattr(value, 'url'), value, getattr(value, 'method'))
+                r.add_url_rule(prefix + getattr(value, 'url'), value, getattr(value, 'method'), name)
 
         return type.__new__(MetaController, name, bases, attrs)
 
