@@ -2,7 +2,7 @@
 # coding: utf-8
 from wsgiref.simple_server import WSGIServer, WSGIRequestHandler
 
-from tramp.tramp import Tramp, BaseController, register, r
+from tramp.tramp import Tramp, BaseController, register, r, Response
 
 
 tramp = Tramp()
@@ -42,12 +42,24 @@ class BookController(BaseController):
         return 'query books'
 
 
+@tramp.before_request
+def judge_user(request):
+    return Response('Find Page')
+
+
+@tramp.before_request
+def judge_hello(request):
+    response = Response('Sorry')
+    response.set_status_code(404)
+
+    return response
+
+
 if __name__ == '__main__':
     host = '127.0.0.1'
     port = 9000
     server = WSGIServer((host, port), WSGIRequestHandler)
     server.set_app(tramp)
     print('Server Listen at: {}:{}'.format(host, port))
-    print(r)
 
     server.serve_forever()
